@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { OffersType, OfferType } from '../../../../offer';
+import { OffersType, OfferType } from '../../types/offer';
 import { ReviewsType } from '../../types/reviews';
 import { DataSliceState } from './types';
 

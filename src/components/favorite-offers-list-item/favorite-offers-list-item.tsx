@@ -1,6 +1,6 @@
 import React from 'react';
 import { CityNames } from '../../types/location';
-import { OffersType } from '../../../../offer';
+import { OffersType } from '../../types/offer';
 import { FavoriteOffersSubList } from '../favorite-offers-sub-list/favorite-offers-list';
 
 type TFavoriteOffersListItem = {

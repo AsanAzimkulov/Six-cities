@@ -1,6 +1,6 @@
-import { OffersType, OfferType } from '../../../offer';
+import { OffersType, OfferType } from '../types/offer';
 import { keysToCamel } from '../utils/work-with-strings/convertCases';
-import { serverDataOffersType, serverDataOfferType, serverDataAuthInfoType, serverDataReviewsType, serverDataReviewType} from '../types/server-data';
+import { serverDataOffersType, serverDataOfferType, serverDataAuthInfoType, serverDataReviewsType, serverDataReviewType } from '../types/server-data';
 import { AuthInfoType } from '../types/authInfo';
 import { ReviewsType, ReviewType } from '../types/reviews';
 
@@ -10,4 +10,4 @@ const adaptAuthInfo = (authInfo: serverDataAuthInfoType): AuthInfoType => keysTo
 const adaptReviews = (reviews: serverDataReviewsType): ReviewsType => reviews.map((review: serverDataReviewType) => keysToCamel(review) as ReviewType);
 
 
-export {adaptOffers, adaptAuthInfo, adaptReviews, adaptOffer};
+export { adaptOffers, adaptAuthInfo, adaptReviews, adaptOffer };

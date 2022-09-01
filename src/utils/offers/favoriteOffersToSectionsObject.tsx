@@ -1,7 +1,7 @@
 import { CityNames } from '../../types/location';
-import { OffersType } from '../../../../offer';
+import { OffersType } from '../../types/offer';
 import clone from 'just-clone';
-import { SectionsObject } from '../../../../offer';
+import { SectionsObject } from '../../types/offer';
 
 export const favoriteOffersToSectionsObject = (favoriteOffers: OffersType): SectionsObject => {
   const offers = clone(favoriteOffers);

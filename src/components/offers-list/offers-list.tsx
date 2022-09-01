@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { OfferType, OffersType } from '../../../../offer';
+import { OfferType, OffersType } from '../../types/offer';
 import Offer from '../offer/offer';
 
 type OffersListType = {
