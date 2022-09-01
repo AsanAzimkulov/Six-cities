@@ -50,7 +50,7 @@ const Map =
 
 
           marker.on('click', () => {
-            if (roomPage && point.id === selectedPoint?.id) {
+            if ((roomPage && point.id !== selectedPoint?.id) || !roomPage) {
               navigate(generatePath(AppRoute.Offer, { id: point.id.toString() }));
             }
           });

@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useRef } from 'react';
 import { ThunkAppDispatch } from '../../types/action';
+import { OfferType } from '../../types/offer';
 import { AuthData } from '../../types/user';
 import { loginAction } from '../../store/actions/api-actions';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
@@ -8,9 +9,17 @@ import { selectUser } from '../../store/user/selectors';
 import { AppRoute, AuthorizationStatus } from '../../types/const';
 import { redirectToRoute } from '../../store/actions/action';
 import { toast } from 'react-toastify';
+import { CityNames } from '../../types/location';
+import { Link } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import { selectData } from '../../store/data/selectors';
+import { changeCity } from '../../store/filter/slice';
+import { searchImages } from '../../services/imageSearchApi';
+// import debounce from 'debounce';
 
 
 const Login = (): JSX.Element => {
+
   const dispatch = useAppDispatch() as ThunkAppDispatch;
 
   const onSubmit = (authData: AuthData) => dispatch(loginAction(authData));
@@ -22,8 +31,42 @@ const Login = (): JSX.Element => {
     }
   }, []);
 
+  const { offers } = useAppSelector(selectData);
+
   const loginRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+
+  function randomNumber(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  const randomCityIndex = randomNumber(1, 6);
+
+  const cities = Object.values(CityNames);
+  const randomCity = cities[randomCityIndex];
+
+  let randomCityImageUrl = '' as any;
+
+  const backgroundImage = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    async function saveImage() {
+      const searchImagesInner = await searchImages();
+      randomCityImageUrl = await searchImagesInner(`${randomCity} Beautiful Buildings`).then((res: any) => res.value[randomNumber(1, 45)].url);
+      console.log(randomCityImageUrl);
+      if (backgroundImage.current) {
+        backgroundImage.current.style.backgroundImage = `url(${randomCityImageUrl})`;
+      }
+    }
+    saveImage();
+  }, []);
+
+
+  const onChangeCity = () => {
+    const offerWithSameCity = offers.find((offer: OfferType) => offer.city.name === randomCity) as OfferType;
+
+    dispatch(changeCity(offerWithSameCity.city));
+  };
 
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
@@ -68,7 +111,7 @@ const Login = (): JSX.Element => {
           </symbol>
         </svg>
       </div>
-      <div className='page page--gray page--login'>
+      <div className='page page--gray page--login' ref={backgroundImage}>
         <Header isAuthPage />
         <main className='page__main page__main--login'>
           <div className='page__login-container container'>
@@ -108,14 +151,17 @@ const Login = (): JSX.Element => {
             </section>
             <section className='locations locations--login locations--current'>
               <div className='locations__item'>
-                <a className='locations__item-link' href='#'>
-                  <span>Amsterdam</span>
-                </a>
+                <Link to={generatePath(AppRoute.Home)}
+                  className='locations__item-link'
+                  onClick={onChangeCity}
+                >
+                  <span>{randomCity}</span>
+                </Link>
               </div>
             </section>
           </div>
         </main>
-      </div>
+      </div >
     </>
   );
 };
