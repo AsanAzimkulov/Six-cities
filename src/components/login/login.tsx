@@ -29,7 +29,7 @@ const Login = (): JSX.Element => {
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     if (passwordRef.current !== null && loginRef.current !== null) {
-      const regex = /d[^0-9]/gi;
+      const regex = /^(?=.*\d)(?=.*[^0-9]).*$/;
       // Check if string contians at least one letter and digit
       const doesPasswordHaveNumberAndLetter = regex.test(passwordRef.current.value);
 
