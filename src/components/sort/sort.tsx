@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SortVariants } from '../../types/sort';
 import classNames from 'classnames';
 
 export type SortPropsType = {
   variants: SortVariants[],
-  onChange: (option: SortVariants) => void
+  onChange: (option: SortVariants) => void,
+  activeId: number
 };
 
-const Sort = ({ variants, onChange }: SortPropsType): JSX.Element => {
-  const [activeSortId, setActiveSortId] = useState<number>(0);
+const Sort = ({ variants, onChange, activeId }: SortPropsType): JSX.Element => {
+  const [activeSortId, setActiveSortId] = useState<number>(activeId);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  useEffect(() => setActiveSortId(activeId), [activeId]);
 
   const onChangeOption = (id: number) => {
     setActiveSortId(id);

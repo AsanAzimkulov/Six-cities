@@ -935,6 +935,7 @@ img {
   stroke: #4481c3
 }
 
+
 .place-card__bookmark-button--active .place-card__bookmark-icon {
   stroke: #4481c3;
   fill: #4481c3
@@ -1649,6 +1650,18 @@ img {
   align-items: flex-start
 }
 
+.form__error-label {
+  color: red;
+  font-size: 11px;
+  margin-top: -10px;
+  margin-left: 5px;
+}
+
+.form__rating--error::before {
+  content: '*';
+  color: red;
+}
+
 .form__rating-label {
   display: block;
   width: 37px;
@@ -1663,10 +1676,11 @@ img {
 
 .form__rating-input:checked~.form__rating-label .form__star-image,
 .form__rating-input:focus~.form__rating-label .form__star-image,
-.form__rating-label:hover .form__star-image,
-.form__rating-label:hover~.form__rating-label .form__star-image {
+.form__rating-label:hover:not(.form__rating-label--disabled) .form__star-image,
+.form__rating-label:hover:not(.form__rating-label--disabled)~.form__rating-label .form__star-image {
   fill: #ff9000
 }
+
 
 .form__star-image {
   fill: #c7c7c7;
@@ -1763,6 +1777,10 @@ img {
 .form__submit:focus,
 .form__submit:hover {
   background-color: #3069a6
+}
+
+.form__rating-label--disabled {
+  cursor: auto;
 }
 
 .form__submit:disabled {
@@ -1998,7 +2016,7 @@ img {
   top: 8%;
 }
 
-.not-found-page__container  .far {
+.not-found-page__container .far {
   position: absolute;
   font-size: 8.5rem;
   left: 42%;
@@ -2086,3 +2104,10 @@ img {
 }
 
 /*# sourceMappingURL=main.css.map */
+
+
+/* Own */
+
+.center {
+  margin: 0 auto;
+}

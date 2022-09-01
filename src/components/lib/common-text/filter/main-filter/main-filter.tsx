@@ -1,28 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import MainFilterOption from './main-filter-option';
 
 
 const MainFilter = <T extends string = string>(
-  { list, onChange, initial,}:
-  {
-    list: T[],
-    initial: number | T,
-    onChange: (option: T) => void,
-  }
+  { list, onChange, active, }:
+    {
+      list: T[],
+      active: number | T,
+      onChange: (option: T) => void,
+    }
 ) => {
-  const isInitialNumber = typeof initial === 'number';
-  let initialId: number;
 
-  if (isInitialNumber) {
-    initialId = initial;
+  const isActiveNumber = typeof active === 'number';
+  let activeId: number;
+
+  if (isActiveNumber) {
+    activeId = active;
   } else {
-    initialId = list.indexOf(initial);
+    activeId = list.indexOf(active);
   }
 
-  const [current, setCurrent] = React.useState<number>(initialId);
+  const [current, setCurrent] = React.useState<number>(activeId);
+
+  useEffect(() => setCurrent(() => {
+    if (isActiveNumber) {
+      return active;
+    } else {
+      return list.indexOf(active);
+    }
+  }), [active]);
+
   const onClickOption = (id: number) => {
     setCurrent(id);
-    if(isInitialNumber){
+    if (isActiveNumber) {
       onChange(list[id]);
     } else {
       onChange(id as unknown as T);
@@ -33,7 +43,7 @@ const MainFilter = <T extends string = string>(
       <ul className='locations__list tabs__list'>
         {
           list.map((option, id) => (
-            <MainFilterOption key = {option} label = {option} isActive={current === id} onClick= {() => onClickOption(id)}/>
+            < MainFilterOption key={option} label={option} isActive={current === id} onClick={() => onClickOption(id)} />
           ))
         }
       </ul>

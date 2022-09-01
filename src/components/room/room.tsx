@@ -9,13 +9,9 @@ import PropertyHeadGallery from '../property-head-gallery/property-head-gallery'
 import PropertyDescription from '../property-description/property-description';
 import ReviewsList from '../reviews-list/reviews-list';
 import Map from '../map/map';
-import { bindActionCreators } from 'redux';
 import { OffersList } from '../offers-list/offers-list';
-import { Store } from '../../types/store';
-import { ConnectedProps } from 'react-redux';
-import { connect } from 'react-redux';
 import NotFoundPage from '../not-found-page/not-found-page';
-import { fetchNearOffersAction, fetchOfferAction } from '../../store/actions/api-actions';
+import { fetchNearOffersAction, fetchOfferAction, setFavoriteAction } from '../../store/actions/api-actions';
 import { fetchReviewsAction } from '../../store/actions/api-actions';
 import generatePoints from '../../utils/map/generatePoints';
 import { AppRoute } from '../../types/const';
@@ -25,55 +21,54 @@ import { toast } from 'react-toastify';
 import { ThunkAppDispatch } from '../../types/action';
 import { AuthorizationStatus } from '../../types/const';
 import Header from './../layout/header/header';
-import { loadOffer } from './../../store/actions/action';
+import { loadOffer } from '../../store/data/slice';
 import axios from 'axios';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { selectData } from '../../store/data/selectors';
+import { selectUser } from '../../store/user/selectors';
+import { selectFilter } from '../../store/filter/selectors';
+
+const FAVORITE_TOGGLE_BAD = 'Не удалось совершить действие, попробуйте ещё раз.';
 
 const UNDEFINED_ERROR_MESSAGE = 'При загрузке предложения произошла неизвестная ошибка!';
 
-const mapStateToProps = ({ offer, reviews, city, nearOffers, isDataLoaded, authorizationStatus }: Store) => ({
-  offer,
-  reviews,
-  city,
-  nearOffers,
-  isDataLoaded,
-  authorizationStatus
-});
+const Room = (): JSX.Element => {
+  const dispatch = useAppDispatch() as ThunkAppDispatch;
 
-const mapDispatchToProps = (dispatch: ThunkAppDispatch) => bindActionCreators({
-  onFetchOffer: fetchOfferAction,
-  onFetchReviews: fetchReviewsAction,
-  onFetchNearOffers: fetchNearOffersAction,
-  onClearOffer: () => loadOffer(null),
-}, dispatch);
+  const onFetchOffer = (id: string) => dispatch(fetchOfferAction(id));
+  const onFetchReviews = (id: string) => dispatch(fetchReviewsAction(id));
+  const onFetchNearOffers = (id: string) => dispatch(fetchNearOffersAction(id));
+  const onClearOffer = () => dispatch(loadOffer(null));
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+  const { offer, nearOffers, reviews } = useAppSelector(selectData);
+  const { authorizationStatus } = useAppSelector(selectUser);
+  const { city } = useAppSelector(selectFilter);
 
-type PropsFromRedux = ConnectedProps<typeof connector>
+  const sortedReviews = [...reviews].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-const Room = ({
-  offer,
-  nearOffers,
-  reviews,
-  authorizationStatus,
-  city,
-  isDataLoaded,
-  onFetchOffer,
-  onFetchReviews,
-  onFetchNearOffers,
-  onClearOffer
-}: PropsFromRedux): JSX.Element => {
   const { id } = useParams();
+  const [isFavorite, setIsFavorite] = React.useState(offer?.isFavorite);
+
+  const onToggleFavorite = async () => {
+    try {
+      await dispatch(setFavoriteAction({ id: String(id), flag: String(+!isFavorite) }));
+      setIsFavorite((prev) => !prev);
+    } catch (error) {
+      toast.error(FAVORITE_TOGGLE_BAD);
+    }
+  };
+
+
   const [noOffer, setNoOffer] = useState<boolean>(false);
   useEffect(() => {
     async function fetchData() {
       try {
         if (id) {
-          const responses = await Promise.all([
+          await Promise.all([
             onFetchOffer(id),
             onFetchReviews(id),
             onFetchNearOffers(id),
           ]);
-          console.log(responses);
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -90,7 +85,7 @@ const Room = ({
     const unlisten = browserHistory.listen(onClearOffer);
     return unlisten;
 
-  }, []);
+  }, [id]);
 
   if (noOffer) {
     return <NotFoundPage />;
@@ -110,7 +105,7 @@ const Room = ({
       images,
       description,
     } = offer;
-    const nearPoints = generatePoints(nearOffers);
+    const nearPoints = generatePoints([...nearOffers].concat(offer));
     return (
       <>
         <div style={{ display: 'none' }}>
@@ -149,8 +144,9 @@ const Room = ({
                   <div className='property__name-wrapper'>
                     <h1 className='property__name'>{title}</h1>
                     <button
-                      className='property__bookmark-button button'
+                      className={classNames('property__bookmark-button', 'button', { 'property__bookmark-button--active': isFavorite })}
                       type='button'
+                      onClick={onToggleFavorite}
                     >
                       <svg
                         className='property__bookmark-icon'
@@ -220,7 +216,7 @@ const Room = ({
                       Reviews ·{' '}
                       <span className='reviews__amount'>{reviews.length}</span>
                     </h2>
-                    <ReviewsList reviews={reviews} />
+                    <ReviewsList reviews={sortedReviews.slice(0, 10)} />
                     {
                       authorizationStatus === AuthorizationStatus.Auth && <CommentForm />
                     }
@@ -232,6 +228,7 @@ const Room = ({
                   selectedPoint={{ ...offer.location, id: offer.id }}
                   points={nearPoints}
                   city={city}
+                  roomPage
                 />
               </section>
             </section>
@@ -259,5 +256,4 @@ const Room = ({
   }
 };
 
-export default connector(Room);
-export { Room };
+export default Room;

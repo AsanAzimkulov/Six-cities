@@ -1,4 +1,4 @@
-import { OffersType, OfferType } from '../../types/offer';
+import { OffersType, OfferType } from '../../../../offer';
 import { SortVariants } from '../../types/sort';
 
 

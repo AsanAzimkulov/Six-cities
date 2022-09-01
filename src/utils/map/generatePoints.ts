@@ -1,5 +1,5 @@
 import { PointsType } from '../../types/location';
-import { OffersType } from '../../types/offer';
+import { OffersType } from '../../../../offer';
 
 
 const generatePoints = (offers: OffersType) => offers.map((offer) => ({

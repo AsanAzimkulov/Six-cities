@@ -1,18 +1,31 @@
 import React from 'react';
+import { CityNames } from '../../types/location';
+import { OffersType, SectionsObject } from '../../../../offer';
+import FavoriteOffersListItem from '../favorite-offers-list-item/favorite-offers-list-item';
 
 
-import {OffersType, OfferType} from '../../types/offer';
-import FavoriteOffer from '../comment-form/favorite-offer/favorite-offer';
+type TFavoriteOffersList = {
+  sections: SectionsObject
+}
 
-type FavoriteOffersListType = {
-  offers: OffersType;
+const FavoriteOffersList = ({ sections }: TFavoriteOffersList) => {
+
+  const keys = Object.keys(sections);
+
+  return (
+    <ul className='favorites__list'>
+      {
+        keys.map((key) => {
+          const section = {
+            city: key as CityNames,
+            offers: sections[key as CityNames] as OffersType,
+          };
+          return <FavoriteOffersListItem section={section} key={key} />;
+        })
+      }
+    </ul>
+  );
 };
-const FavoriteOffersList = ({ offers }: FavoriteOffersListType) => (
-  <>
-    {offers.map((offer: OfferType) => (
-      <FavoriteOffer key={offer.id} offer = {offer} />
-    ))}
-  </>
-);
 
-export { FavoriteOffersList };
+
+export default FavoriteOffersList;

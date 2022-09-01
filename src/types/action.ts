@@ -1,7 +1,10 @@
 import { ThunkAction, ThunkDispatch } from '@reduxjs/toolkit';
-import { changeCity, changeSort, loadNearOffers, loadOffer, loadOffers, loadReviews, requireLogout, setUser } from '../store/actions/action';
+import { changeSort } from '../store/sort/slice';
+import { changeCity } from '../store/filter/slice';
+import { loadOffer, loadNearOffers, loadOffers, loadReviews } from '../store/data/slice';
+import { setUser, requireLogout, requireAuthorization } from '../store/user/slice';
 import { Store } from './store';
-import { requireAuthorization, redirectToRoute } from './../store/actions/action';
+import {redirectToRoute} from './../store/actions/action';
 import { AxiosInstance } from 'axios';
 
 export enum ActionType {

@@ -17,6 +17,7 @@ type MapProps = {
   city: CityType;
   selectedPoint: PointType | undefined;
   containerRef?: { current: null | HTMLElement };
+  roomPage?: boolean
 };
 
 const defaultCustomIcon = new Icon({
@@ -32,7 +33,7 @@ const currentCustomIcon = new Icon({
 });
 
 const Map =
-  ({ points, city, selectedPoint, containerRef }: MapProps): JSX.Element => {
+  ({ points, city, selectedPoint, containerRef, roomPage = false }: MapProps): JSX.Element => {
     const mapRef = useRef(null);
     const map = useMap(mapRef, city);
     const navigate = useNavigate();
@@ -47,7 +48,12 @@ const Map =
             lng: point.longitude,
           });
 
-          marker.on('click', () => navigate(generatePath(AppRoute.Offer, { id: point.id.toString() })));
+
+          marker.on('click', () => {
+            if (roomPage && point.id === selectedPoint?.id) {
+              navigate(generatePath(AppRoute.Offer, { id: point.id.toString() }));
+            }
+          });
 
           marker
             .setIcon(

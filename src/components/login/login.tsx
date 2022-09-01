@@ -1,31 +1,48 @@
-import { FormEvent, useRef } from 'react';
+import { FormEvent, useEffect, useRef } from 'react';
 import { ThunkAppDispatch } from '../../types/action';
 import { AuthData } from '../../types/user';
 import { loginAction } from '../../store/actions/api-actions';
-import { connect } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import Header from '../layout/header/header';
+import { selectUser } from '../../store/user/selectors';
+import { AppRoute, AuthorizationStatus } from '../../types/const';
+import { redirectToRoute } from '../../store/actions/action';
+import { toast } from 'react-toastify';
 
 
-const mapDispatchToProps = (dispatch: ThunkAppDispatch) => ({
-  onSubmit(authData: AuthData) {
-    dispatch(loginAction(authData));
-  },
-});
+const Login = (): JSX.Element => {
+  const dispatch = useAppDispatch() as ThunkAppDispatch;
 
-const connector = connect(null, mapDispatchToProps);
+  const onSubmit = (authData: AuthData) => dispatch(loginAction(authData));
+  const { authorizationStatus } = useAppSelector(selectUser);
 
+  useEffect(() => {
+    if (authorizationStatus === AuthorizationStatus.Auth) {
+      dispatch(redirectToRoute(AppRoute.Home));
+    }
+  }, []);
 
-const Login = (props: { onSubmit: (authData: AuthData) => void }): JSX.Element => {
   const loginRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    if (loginRef.current !== null && passwordRef.current !== null) {
-      props.onSubmit({
-        login: loginRef.current.value,
-        password: passwordRef.current.value
-      });
+    if (passwordRef.current !== null && loginRef.current !== null) {
+      const regex = /d[^0-9]/gi;
+      // Check if string contians at least one letter and digit
+      const doesPasswordHaveNumberAndLetter = regex.test(passwordRef.current.value);
+
+      if (doesPasswordHaveNumberAndLetter) {
+        onSubmit({
+          login: loginRef.current.value,
+          password: passwordRef.current.value
+        });
+      } else {
+        toast.info('Password must contain at least one letter and digit');
+      }
+    } else {
+      toast.error('Вo not leave the fields empty!');
     }
   };
   return (
@@ -52,23 +69,7 @@ const Login = (props: { onSubmit: (authData: AuthData) => void }): JSX.Element =
         </svg>
       </div>
       <div className='page page--gray page--login'>
-        <header className='header'>
-          <div className='container'>
-            <div className='header__wrapper'>
-              <div className='header__left'>
-                <a className='header__logo-link' href='main.html'>
-                  <img
-                    className='header__logo'
-                    src='img/logo.svg'
-                    alt='6 cities logo'
-                    width={81}
-                    height={41}
-                  />
-                </a>
-              </div>
-            </div>
-          </div>
-        </header>
+        <Header isAuthPage />
         <main className='page__main page__main--login'>
           <div className='page__login-container container'>
             <section className='login'>
@@ -120,6 +121,6 @@ const Login = (props: { onSubmit: (authData: AuthData) => void }): JSX.Element =
 };
 
 
-export default connector(Login);
+export default Login;
 export { Login };
 

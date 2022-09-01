@@ -1,44 +1,77 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import qs from 'qs';
 import { useState, useRef } from 'react';
 import { OffersList } from '../offers-list/offers-list';
-import { SortVariants } from '../../types/sort';
-import { Dispatch } from 'redux';
+import { SortVariants, SortVariantsBuffer } from '../../types/sort';
 import { CityNames, CityType, PointType } from '../../types/location';
 import Map from '../map/map';
 import Sort from './../sort/sort';
-import { Store } from '../../types/store';
-import { connect, ConnectedProps } from 'react-redux';
 import generatePoints from './../../utils/map/generatePoints';
-import { OfferType } from '../../types/offer';
-import { changeCity, changeSort } from './../../store/actions/action';
-import { Actions } from '../../types/action';
+import { OfferType } from '../../../../offer';
+import { changeCity } from '../../store/filter/slice';
+import { changeSort } from '../../store/sort/slice';
 import MainFilter from '../lib/common-text/filter/main-filter/main-filter';
 import { sortOffers } from '../../utils/offers/sortOffers';
 import { ServerConfig } from '../../services/const';
 import Header from '../layout/header/header';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { selectData } from '../../store/data/selectors';
+import { selectFilter } from '../../store/filter/selectors';
+import { selectSort } from '../../store/sort/selectors';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../types/const';
 
-const mapStateToProps = ({ offers, city, sort }: Store) => ({
-  offers,
-  city,
-  sort
-});
 
-const mapDispatchToProps = (dispatch: Dispatch<Actions>) => ({
-  onChangeCity(city: CityType) {
+const Main = (): JSX.Element => {
+  const isMounted = useRef<boolean>(false);
+  const dispatch = useAppDispatch();
+
+  const onChangeCity = (city: CityType) => {
     dispatch(changeCity(city));
-  },
-  onChangeSort(sort: SortVariants) {
+  };
+
+  const onChangeSort = (sort: SortVariants) => {
     dispatch(changeSort(sort));
-  }
-});
+  };
 
-const connector = connect(mapStateToProps, mapDispatchToProps);
+  const { offers } = useAppSelector(selectData);
+  const { city } = useAppSelector(selectFilter);
+  const { sort } = useAppSelector(selectSort);
 
-type PropsFromRedux = ConnectedProps<typeof connector>
-
-const Main = ({ offers, city, onChangeCity, sort, onChangeSort }: PropsFromRedux): JSX.Element => {
   const filteredOffers = React.useMemo(() => offers.filter((offer) => offer.city.name === city.name), [city]);
   const sortedOffers = sortOffers(filteredOffers, sort, ServerConfig.sorting);
+
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if (window.location.search) {
+      const params = qs.parse(window.location.search.substring(1));
+      console.log(params);
+      if (params.sort && params.city) {
+        const paramsCity = params.city as unknown as CityType;
+        const qsSort = params.sort as unknown as SortVariants;
+        const paramsSort = SortVariantsBuffer[qsSort] as unknown as SortVariants;
+        console.log(paramsSort, paramsCity);
+        dispatch(changeSort(paramsSort));
+        dispatch(changeCity(paramsCity));
+      } else {
+        navigate(AppRoute.Home);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isMounted.current) {
+      const queryString = qs.stringify({
+        sort: SortVariantsBuffer[sort],
+        city
+      });
+      navigate(`?${queryString}`);
+    }
+    isMounted.current = true;
+  }, [city, sort]);
+
 
   const mapContainerRef = useRef<HTMLElement | null>(null);
 
@@ -53,14 +86,16 @@ const Main = ({ offers, city, onChangeCity, sort, onChangeSort }: PropsFromRedux
     }
   };
   const points = React.useMemo(() => generatePoints(filteredOffers), [filteredOffers]);
+
   const onChangeCityFilter = (cityName:
-    CityNames) => {
+    string) => {
     if (city.name === cityName) {
       return;
     }
     const offerWithSameCity = offers.find((offer: OfferType) => offer.city.name === cityName) as OfferType;
     onChangeCity(offerWithSameCity.city);
   };
+
   const onChangeOffersSort = (option: SortVariants) => {
     if (option === sort) {
       return;
@@ -76,36 +111,52 @@ const Main = ({ offers, city, onChangeCity, sort, onChangeSort }: PropsFromRedux
       <main className='page__main page__main--index'>
         <h1 className='visually-hidden'>Cities</h1>
         <div className='tabs'>
-          <MainFilter list={filterOptions} onChange={onChangeCityFilter} initial={0} />
+          <MainFilter list={filterOptions} onChange={onChangeCityFilter} active={filterOptions.indexOf(city.name)} />
         </div>
-        <div className='cities'>
-          <div className='cities__places-container container'>
-            <section className='cities__places places'>
-              <h2 className='visually-hidden'>Places</h2>
-              <b className='places__found'>{filteredOffers.length} places to stay in Amsterdam</b>
-              <Sort variants={offersSortVariants}
-                onChange={onChangeOffersSort}
-              />
-              <div className='cities__places-list places__list tabs__content'>
-                <OffersList offers={sortedOffers} onOfferHover={onOfferHover} />
+        {
+          offers.length === 0 ?
+            <div className='cities page__main--index-empty'>
+              <div className='cities__places-container cities__places-container--empty container'>
+                <section className='cities__no-places'>
+                  <div className='cities__status-wrapper tabs__content'>
+                    <b className='cities__status'>No places to stay available</b>
+                    <p className='cities__status-description'>We could not find any property available at the moment in Dusseldorf</p>
+                  </div>
+                </section>
+                <div className='cities__right-section'></div>
               </div>
-            </section>
-            <div className='cities__right-section'>
-              <section className='cities__map map' ref={mapContainerRef}>
-                <Map
-                  points={points}
-                  selectedPoint={selectedPoint}
-                  city={city}
-                  containerRef={mapContainerRef}
-                />
-              </section>
             </div>
-          </div>
-        </div>
+            :
+            <div className='cities'>
+              <div className='cities__places-container container'>
+                <section className='cities__places places'>
+                  <h2 className='visually-hidden'>Places</h2>
+                  <b className='places__found'>{filteredOffers.length} places to stay in {city.name}</b>
+                  <Sort variants={offersSortVariants}
+                    onChange={onChangeOffersSort}
+                    activeId={Object.values(SortVariants).indexOf(sort)}
+                  />
+                  <div className='cities__places-list places__list tabs__content'>
+                    <OffersList offers={sortedOffers} onOfferHover={onOfferHover} />
+                  </div>
+                </section>
+                <div className='cities__right-section'>
+                  <section className='cities__map map' ref={mapContainerRef}>
+                    <Map
+                      points={points}
+                      selectedPoint={selectedPoint}
+                      city={city}
+                      containerRef={mapContainerRef}
+                    />
+                  </section>
+                </div>
+              </div>
+            </div>
+        }
       </main>
     </div>
   );
 };
 
-export default connector(Main);
-export { Main };
+export default Main;
+

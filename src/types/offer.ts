@@ -36,3 +36,12 @@ export type OfferType = {
 };
 
 export type OffersType = OfferType[];
+
+export type TFavoriteOfferData = {
+  id: string,
+  flag: string,
+}
+
+export type SectionsObject = {
+  [key in keyof typeof CityNames]: OffersType
+}

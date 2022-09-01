@@ -9,6 +9,7 @@ export enum HttpCode {
   UNAUTHORIZED = 401,
   BAD_REQUEST = 400,
   NOT_FOUND = 404,
+  UNAVAILABLE = 503,
 }
 
 type UnauthorizedCallback = () => void;

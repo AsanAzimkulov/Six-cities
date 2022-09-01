@@ -1,7 +1,7 @@
 import { AuthInfoType } from './authInfo';
 import { AuthorizationStatus } from './const';
 import { CityType } from './location';
-import { OffersType, OfferType } from './offer';
+import { OffersType, OfferType } from '../../../offer';
 import { ReviewsType } from './reviews';
 import { SortVariants } from './sort';
 
