@@ -5,11 +5,10 @@ import { setFavoriteAction } from '../../store/actions/api-actions';
 import { ThunkAppDispatch } from '../../types/action';
 import { AppRoute } from '../../types/const';
 
-import { OfferType } from '../../../../offer';
+import { OfferType } from '../../types/offer';
 import { selectData } from '../../store/data/selectors';
 import { loadFavoriteOffers } from '../../store/data/slice';
 import { toast } from 'react-toastify';
-
 
 const FAVORITE_BAD_POST = 'Не удалось удалить из избранного, попробуйте ещё раз';
 
@@ -23,7 +22,7 @@ const FavoriteOffer = ({ offer }: FavoriteOfferPropsType) => {
 
   const { favoriteOffers } = useAppSelector(selectData);
 
-  const isFavorited = favoriteOffers.some((favoriteOffer) => favoriteOffer.id === id);
+  const isFavorited = favoriteOffers.some((favoriteOffer: OfferType) => favoriteOffer.id === id);
 
   const [isFavorite, setIsFavorite] = React.useState(favorited);
 

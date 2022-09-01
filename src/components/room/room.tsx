@@ -47,7 +47,7 @@ const Room = (): JSX.Element => {
   const sortedReviews = [...reviews].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const { id } = useParams();
-  const [isFavorite, setIsFavorite] = React.useState(offer?.isFavorite);
+  const [isFavorite, setIsFavorite] = React.useState<boolean>(offer?.isFavorite);
 
   const onToggleFavorite = async () => {
     try {

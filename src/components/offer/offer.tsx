@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { Link, generatePath } from 'react-router-dom';
 
-import { OfferType } from '../../../../offer';
+import { OfferType } from '../../types/offer';
 import { AppRoute } from '../../types/const';
 import { useAppDispatch } from '../../hooks/redux';
 import { setFavoriteAction } from '../../store/actions/api-actions';
@@ -17,7 +17,7 @@ type OfferPropsType = {
 };
 const Offer = ({ offer, onHover }: OfferPropsType) => {
   const { id, price, rating, previewImage, isPremium, type, title, isFavorite: favorited } = offer;
-  const [isFavorite, setIsFavorite] = React.useState(favorited);
+  const [isFavorite, setIsFavorite] = React.useState<boolean>(favorited);
 
   const dispatch = useAppDispatch() as ThunkAppDispatch;
 

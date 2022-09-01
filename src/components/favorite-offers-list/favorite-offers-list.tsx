@@ -1,6 +1,6 @@
 import React from 'react';
 import { CityNames } from '../../types/location';
-import { OffersType, SectionsObject } from '../../../../offer';
+import { OffersType, SectionsObject } from '../../types/offer';
 import FavoriteOffersListItem from '../favorite-offers-list-item/favorite-offers-list-item';
 
 

@@ -7,7 +7,7 @@ import { CityNames, CityType, PointType } from '../../types/location';
 import Map from '../map/map';
 import Sort from './../sort/sort';
 import generatePoints from './../../utils/map/generatePoints';
-import { OfferType } from '../../../../offer';
+import { OfferType } from '../../types/offer';
 import { changeCity } from '../../store/filter/slice';
 import { changeSort } from '../../store/sort/slice';
 import MainFilter from '../lib/common-text/filter/main-filter/main-filter';
@@ -38,7 +38,7 @@ const Main = (): JSX.Element => {
   const { city } = useAppSelector(selectFilter);
   const { sort } = useAppSelector(selectSort);
 
-  const filteredOffers = React.useMemo(() => offers.filter((offer) => offer.city.name === city.name), [city]);
+  const filteredOffers = React.useMemo(() => offers.filter((offer: OfferType) => offer.city.name === city.name), [city]);
   const sortedOffers = sortOffers(filteredOffers, sort, ServerConfig.sorting);
 
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ const Main = (): JSX.Element => {
     undefined
   );
   const onOfferHover = (id: number): void => {
-    const currentOffer = offers.find((offer) => id === offer.id);
+    const currentOffer = offers.find((offer: OfferType) => id === offer.id);
     if (currentOffer) {
       const currentPoint = { ...currentOffer.location, id: currentOffer.id };
       setSelectedPoint(currentPoint);

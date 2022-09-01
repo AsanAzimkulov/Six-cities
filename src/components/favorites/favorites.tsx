@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { AppRoute } from '../../types/const';
 import { favoriteOffersToSectionsObject } from '../../utils/offers/favoriteOffersToSectionsObject';
 import FavoritesEmpty from '../favorites-empty/favorites-empty';
-import { SectionsObject } from '../../../../offer';
+import { SectionsObject } from '../../types/offer';
 import FavoriteOffersList from '../favorite-offers-list/favorite-offers-list';
 import ReactLoading from 'react-loading';
 import { LoadingVidget } from '../../types/libs/react-loading';

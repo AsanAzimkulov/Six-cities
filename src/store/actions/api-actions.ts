@@ -9,7 +9,7 @@ import { setToken, dropToken } from '../../services/token';
 import { AppRoute } from '../../types/const';
 import { toast } from 'react-toastify';
 import { adaptOffers, adaptOffer, adaptAuthInfo, adaptReviews } from '../../services/adapter';
-import { TFavoriteOfferData } from '../../../../offer';
+import { TFavoriteOfferData } from '../../types/offer';
 import { serverDataOffersType, serverDataOfferType, serverDataAuthInfoType, serverDataReviewsType } from '../../types/server-data';
 import axios from 'axios';
 import { HttpCode } from '../../services/api';
