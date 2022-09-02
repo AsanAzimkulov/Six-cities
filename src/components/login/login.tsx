@@ -15,6 +15,7 @@ import { generatePath } from 'react-router-dom';
 import { selectData } from '../../store/data/selectors';
 import { changeCity } from '../../store/filter/slice';
 import { searchImages } from '../../services/imageSearchApi';
+import randomNumber from '../../utils/id/randomNumber';
 // import debounce from 'debounce';
 
 
@@ -36,16 +37,10 @@ const Login = (): JSX.Element => {
   const loginRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
-  function randomNumber(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-
   const randomCityIndex = randomNumber(1, 6);
 
   const cities = Object.values(CityNames);
   const randomCity = cities[randomCityIndex];
-
-  let randomCityImageUrl = '' as any;
 
   const backgroundImage = useRef<HTMLDivElement | null>(null);
 
@@ -53,9 +48,9 @@ const Login = (): JSX.Element => {
     async function saveImage() {
       console.log(99);
       const searchImagesInner = await searchImages();
-      randomCityImageUrl = await searchImagesInner(`${randomCity} Beautiful Buildings`).then((res: any) => res.value[randomNumber(1, 45)].url);
+      const randomCityImageUrl = await searchImagesInner(`${randomCity} Beautiful city high quality`).then((res: any) => res.value[randomNumber(1, 45)].url);
       console.log(randomCityImageUrl);
-      if (backgroundImage.current) {
+      if (backgroundImage.current && randomCityImageUrl) {
         backgroundImage.current.style.backgroundImage = `url(${randomCityImageUrl})`;
       }
     }
@@ -170,4 +165,5 @@ const Login = (): JSX.Element => {
 
 export default Login;
 export { Login };
+
 

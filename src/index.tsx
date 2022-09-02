@@ -5,7 +5,7 @@ import { createAPI } from './services/api';
 import { Provider } from 'react-redux';
 import { ThunkAppDispatch } from './types/action';
 
-import {setupStore } from './store/store';
+import { setupStore } from './store/store';
 
 import App from './components/app/app';
 
@@ -34,10 +34,10 @@ const root = createRoot(
 
 
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <ToastContainer />
-      <App />
-    </Provider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <Provider store={store}>
+    <ToastContainer />
+    <App />
+  </Provider>
+  // </React.StrictMode>
 );
