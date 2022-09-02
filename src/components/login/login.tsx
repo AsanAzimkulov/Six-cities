@@ -51,6 +51,7 @@ const Login = (): JSX.Element => {
 
   useEffect(() => {
     async function saveImage() {
+      console.log(99);
       const searchImagesInner = await searchImages();
       randomCityImageUrl = await searchImagesInner(`${randomCity} Beautiful Buildings`).then((res: any) => res.value[randomNumber(1, 45)].url);
       console.log(randomCityImageUrl);
